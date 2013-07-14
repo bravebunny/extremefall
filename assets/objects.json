@@ -1,0 +1,28 @@
+{"frames": {
+
+"book.png":
+{
+	"frame": {"x":2,"y":2,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"plasticBag.png":
+{
+	"frame": {"x":2,"y":84,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+}},
+"meta": {
+	"app": "http://www.texturepacker.com",
+	"version": "1.0",
+	"image": "objects.png",
+	"format": "RGBA8888",
+	"size": {"w":84,"h":166},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:0f2ceffc53d212d990caa3a867315b88$"
+}
+}
