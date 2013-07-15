@@ -53,10 +53,10 @@ class StupidGuy
 	
 	public void CreateRandomTimes(int levelTimeout)
 	{
-		Times = new int[random(MinTimes, MaxTimes) * levelTimeout / 1000];
+		Times = new int[(int)random(MinTimes, MaxTimes)];
 
 		if (Times.length == 1)
-			Times[0] = random.Next(100, 800);
+			Times[0] = random(100, 800);
 		else if (Times.length > 1)
 		{
 			Times[0] = random(100, levelTimeout - Times.length * 200);
@@ -82,14 +82,14 @@ class StupidGuy
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{  
 					Timeout = ticksTime + Time;
 
 					Y = ScreenHeight - Height - 50;
 					X = -Width;
 
-					//Make Visible
+					Active = true;
 
 					Direction = "right";
 				}
@@ -111,14 +111,14 @@ class StupidGuy
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Timeout = ticksTime + Time;
 
 					Y = ScreenHeight - Height - 50;
 					X = ScreenWidth;
 
-					//Make Visible
+					Active = true;
 
 					Direction = "left";
 				}
@@ -140,14 +140,14 @@ class StupidGuy
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Timeout = ticksTime + Time;
 
 					Y = 50;
 					X = ScreenWidth;
 
-					//Make Visible
+					Active = true;
 
 					Direction = "left";
 				}
@@ -165,8 +165,6 @@ class StupidGuy
 			else if (Direction == "left")
 				X -= SpeedX * ResolutionRatio;
 		}
-
-		UpdateImage();
 	}
 	
 	public void UpdateImage()
@@ -178,6 +176,13 @@ class StupidGuy
 	{
 		Width = wid;
 		Height = hei;
+	}
+
+	public void Hide()
+	{
+		Active = false;
+		X = -1000;
+		Y = -1000;
 	}
 
 

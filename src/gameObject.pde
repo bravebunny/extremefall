@@ -77,9 +77,6 @@ class GameObject
 		Frame1Source = loadImage(uri);
 		Image = Frame0Source;
 
-		Width = Image.Width;
-		Height = Image.Height;
-
 		Type = type;
 
 		if (Type == "bubble" || Type == "bullet")
@@ -91,7 +88,7 @@ class GameObject
 	
 	public void CreateRandomTimes(int levelTimeout)
 	{
-		Times = new int[random(MinTimes, MaxTimes) * levelTimeout / 1000];
+		Times = new int[random(MinTimes, MaxTimes)];
 
 		if (Times.length == 1)
 			Times[0] = random(100, 800);
@@ -112,11 +109,12 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Y = ScreenHeight;
 					X = random(200, (int)ScreenWidth - 200);
-					//Make Visible
+		
+					Active = true;
 				}
 			}
 
@@ -126,11 +124,12 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
-					Y = 0;
+					Y = -Height;
 					X = random(200, (int)ScreenWidth - 200);
-					//Make Visible
+		
+					Active = true;
 				}
 			}
 
@@ -140,13 +139,14 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Y = ScreenHeight;
 					X = ScreenWidth;
 					SpeedX = random(5, 20);
 					SpeedY = random(5, 20);
-					//Make Visible
+		
+					Active = true;
 				}
 			}
 
@@ -157,13 +157,14 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Y = ScreenHeight;
 					X = 0;
 					SpeedX = random(5, 20);
 					SpeedY = random(5, 20);
-					//Make Visible
+		
+					Active = true;
 				}
 			}
 
@@ -182,8 +183,6 @@ class GameObject
 			}
 		}
 
-		UpdateImage();
-
 		CenterX = X + Width / 2;
 		CenterY = Y + Height / 2;
 	}
@@ -194,21 +193,20 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Y = stupidGuy.Y + 24 * 4;
 					X = stupidGuy.X + 48 * 4;
 					SpeedX = random(5, 20);
 					SpeedY = random(5, 20);
-					//Make Visible
+					
+					Active = true;
 				}
 			}
 
 			X += SpeedX * ResolutionRatio;
 			Y -= SpeedY * ResolutionRatio;
 		}
-
-		UpdateImage();
 
 		CenterX = X + Width / 2;
 		CenterY = Y + Height / 2;
@@ -220,19 +218,18 @@ class GameObject
 		{
 			for (int i=0; i < Times.length; i++)
 			{
-				if (Times[i] == ticksTime)
+				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
 				{
 					Y = player.Y + 50;
 					X = player.X;
 					SpeedX = random(5, 20);
-					//Make Visible
+					
+					Active = true;
 
 					Direction = player.Direction;
 				}
 			}
 		}
-
-		UpdateImage();
 
 		CenterX = X + Width / 2;
 		CenterY = Y + Height / 2;
@@ -276,5 +273,12 @@ class GameObject
 	{
 		SpeedX = speedX;
 		SpeedY = speedY;
+	}
+
+	public void Hide()
+	{
+		Active = false;
+		X = -1000;
+		Y = -1000;
 	}
 }

@@ -36,6 +36,14 @@ class Overlay
 		Mode = mode;
 	}
 
+	public void Update(long ticksTime)
+	{
+		if (ticksTime < Timeout)
+		{
+			//UpdateImage();
+		}
+	}
+
 	public void UpdateImage()
 	{
 		if (Mode == "timer")
@@ -66,7 +74,7 @@ class Overlay
 		set(X, Y, Image);
 	}
 
-	public void AddToPlayer(Player player, long ticksTime )
+	public void AddToPlayer(Player player)
 	{
 		X = player.X;
 		Y = player.Y;
@@ -76,8 +84,13 @@ class Overlay
 		MaxY = player.MaxY;
 
 		Direction = player.Direction;
+	}
 
-		Update(ticksTime);
+	public void Hide()
+	{
+		Active = false;
+		X = -1000;
+		Y = -1000;
 	}
 
 }

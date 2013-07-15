@@ -14,6 +14,8 @@ class Player
 
 	public String Direction = "stop";
 
+	public boolean Active = true;
+	
 	public boolean BubbleOn = false;
 	public boolean GunOn = false;
 
@@ -106,6 +108,13 @@ class Player
 			Direction = "left";
 		else
 			Direction = "right";
+	}
+
+	public void Hide()
+	{
+		Active = false;
+		X = -1000;
+		Y = -1000;
 	}
 }
 

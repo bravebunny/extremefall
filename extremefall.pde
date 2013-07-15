@@ -78,9 +78,9 @@ void setup()
 	objects[6] = new GameObject("assets/bullet.png", "bullet");
 	objects[7] = new GameObject("assets/smallBubble.png", "bubble");
 
-	stupidGuys[0] = new StupidGuy("assets/zeca.png", 0, 3, 100, "zeca");
-	stupidGuys[1] = new StupidGuy("assets/nuno.png", 0, 3, 100, "nuno");
-	stupidGuys[2] = new StupidGuy("assets/fred.png", 0, 3, 100, "fred");
+	stupidGuys[0] = new StupidGuy("assets/zeca.png", 1, 3, 100, "zeca");
+	stupidGuys[1] = new StupidGuy("assets/nuno.png", 1, 3, 100, "nuno");
+	stupidGuys[2] = new StupidGuy("assets/fred.png", 1, 3, 100, "fred");
 	
 	for (int i = 0; i < players.length; i++)
 	{
@@ -91,7 +91,8 @@ void setup()
 
 	for (int i = 0; i < objects.length; i++)
 	{
-		objects[i].SetSize(48, 48);
+		objects[i].Hide();
+        objects[i].SetSize(38, 38);
 		objects[i].SetScreenSize(screenWidth, screenHeight, resolutionRatio);
 	}
 	objects[6].SetSize(10, 10);
@@ -103,6 +104,8 @@ void setup()
 		stupidGuys[i].SetSize(224, 280);
 		stupidGuys[i].SetScreenSize(screenWidth, screenHeight, resolutionRatio);
 	}
+
+	createRandomLevel();
 	
 	background(125);
 	fill(0);
@@ -112,7 +115,257 @@ void setup()
 
 void draw() 
 {
-	updateBackground();
+	if (ticksTime < levelTimeout)
+	{
+		// Background Images
+		updateBackground();
+		
+		// Keys
+		for (int i = 0; i < players.length; i++)
+		{
+			if (ticksTime < playersTimeout)
+			{
+				if (players[i].Direction == "stop")
+				{
+					overlays[i].AddToPlayer(players[i]);
+					overlays[i].UpdateImage();
+				}
+			}
+		}
+		
+		// Zeca bubbles
+		for (int i = 0; i < stupidGuys[0].Times.length; i++)
+		{
+			if ((long)stupidGuys[0].Times[i] == ticksTime)
+			{
+				objects[7].Times[0] = (int)ticksTime + objects[7].Wait;
+			}
+			else if (ticksTime == stupidGuys[0].Times[i] + objects[7].Wait)
+			{
+				// Play Sound
+			}
+		}
+		for (int i = 0; i < players.length; i++)
+		{
+			if (players[i].BubbleOn)
+			{
+				// Add bubble to player
+				overlays[3].AddToPlayer(players[i]);
+				players[i].BubbleOn = overlays[3].Active;
+			}
+		}
+		
+		// Update guns and bullets
+		for (int i = 0; i < players.length; i++)
+		{
+			if (players[i].GunOn)
+			{
+				// Add gun to player
+				overlays[4].AddToPlayer(players[i]);
+				// Bullet
+				objects[6].SetSpeed(30, 0);
+				objects[6].Update(ticksTime, players[i]);
+				objects[6].Update(ticksTime);
+
+				for (int o=0; o < objects[6].Times; o++)
+				{
+					if (objects[6].Times[o] == ticksTime)
+					{
+						//soundGunShot.Play();
+					}
+				}
+			}
+		}
+		
+		// Update Stupid Guys Position
+		for (int i = 0; i < stupidGuys.length; i++)
+		{
+			stupidGuys[i].Update(ticksTime);
+		}
+		
+		// Update Objects
+		for (int i = 0; i < 7; i++)
+		{
+			objects[i].Update(ticksTime);
+		}
+		// Update Bubble acording to Zeca
+		objects[7].Update(ticksTime, stupidGuys[0]);
+		
+		//Update Overlays
+		for (int i = 0; i < overlays.length; i++)
+		{
+			overlays[i].Update(ticksTime);
+		}
+		
+		// Player/Object Interaction
+		for (int i = 0; i < players.length; i++)
+		{
+			if (players[i].MaxY > 0 && players[i].Y < screenWidth)
+			{
+				if (players[i].Direction != "stop") // Laser
+				{
+					if (players[i].MaxX > screenWidth)
+					{
+						//soundPain.Play();
+						players[i].Score -= laserPoints;
+						overlays[5].AddToPlayer(players[i]);
+						overlays[5].Timeout = ticksTime + 1;
+						players[i].X -= 10;
+					}
+					else if (players[i].X < 0)
+					{
+						//soundPain.Play();
+						players[i].Score -= laserPoints;
+						overlays[5].AddToPlayer(players[i]);
+						overlays[5].Timeout = ticksTime + 1;
+						players[i].X += 10;
+					}
+				}
+
+				for (int o = 0; o < objects.length; o++)
+				{
+					if ((players[i].X < objects[o].CenterX && objects[o].CenterX < (players[i].X + players[i].Width)) && (players[i].Y <= objects[o].CenterY && objects[o].CenterY <= (players[i].Y + players[i].Height)))
+					{
+						if (objects[o].Type == "birdLeft" || objects[o].Type == "birdRight") // Birds
+						{
+							objects[o].Hide();
+							//soundBird.Play();
+							players[i].Score += birdPoints;
+						}
+						else if (objects[o].Type == "beer") // Beer
+						{
+							objects[o].Hide();
+							players[i].Score += beerPoints;
+							//soundBeer.Play();
+						}
+						else if (objects[o].Type == "bubble") // Bubble
+						{
+							if (!overlays[3].Active)
+							{
+								objects[o].Hide();
+								//soundBubble.Play();
+								players[i].BubbleOn = true;
+								players[i].Score += bubblePoints;
+								overlays[3].AddToPlayer(players[i]);
+								overlays[3].Timeout = (int)ticksTime + overlays[3].Wait;
+								overlays[3].Active = true;
+							}
+						}
+						else if (objects[o].Type == "gun") // Gun
+						{
+							objects[o].Hide();
+
+							//soundGrabGun.Play();
+							players[i].GunOn = true;
+							players[i].Score += gunPoints;
+							overlays[4].Timeout = objects[o].Wait + (int)ticksTime;
+							overlays[4].Active = true;
+
+							objects[6].Times[0] = (int)ticksTime + objects[6].Wait;
+
+						}
+						else if (objects[o].Type == "bullet") // Bullet
+						{
+							if (players[i].GunOn == false)
+							{
+								//soundPain.Play();
+								overlays[5].AddToPlayer(players[i], ticksTime);
+								overlays[5].Timeout = ticksTime + 1;
+								players[i].Score -= bulletPoints;
+
+							}
+						}
+						else if (objects[o].Type == "plasticBag") // Plastic Bag
+						{
+							//soundBag.Play();
+							players[i].Score += plasticBagsPoints;
+
+							players[i].Y -= 10;
+						}
+						else if (objects[o].Type == "book") // Book
+						{
+							//soundBook.Play();
+							players[i].Score += bookPoints;
+
+							players[i].Y += 10;
+						}
+					}
+				}
+			}
+		}
+		
+		// Player/Player Interaction
+		for (int a = 0; a < players.length; a++)
+		{
+			for (int b = 0; b < players.length; b++)
+			{
+				if (players[a].BubbleOn && overlays[3].Active)
+				{
+					if ((players[a].Y >= players[b].Y && players[a].Y <= players[b].MaxY) || (players[b].Y >= players[a].Y && players[b].Y <= players[a].MaxY))
+					{
+						if (players[a].Direction == "left")
+						{
+							if (players[b].MaxX > players[a].X && players[b].X < players[a].X)
+							{
+								players[b].X = players[a].X - players[b].Width;
+							}
+						}
+						else if (players[a].Direction == "right")
+						{
+							if (players[a].MaxX > players[b].X && players[a].MaxX < players[b].MaxX)
+							{
+								players[b].X = players[a].X + players[a].Width;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// Update Players
+		for (int i = 0; i < players.length; i++)
+		{
+			if(players[i].Active)
+			{
+				players[i].UpdatePosition(horizontalSpeed * resolutionRatio);
+				players[i].UpdateImage();
+			}
+		}
+	}
+	
+	
+	if (ticksTime > playersTimeout)
+	{
+		// Hide players
+		for (int i = 0; i < players.length; i++)
+		{
+			if (players[i].Direction == "stop")
+			{
+				players[i].Hide();
+			}
+		}
+	}
+
+	// Update Objects
+	for (int i = 0; i < objects.length; i++)
+	{
+		if(objects[i].Active)
+			objects[i].UpdateImage();
+	}
+	// Update Overlays
+	for (int i = 0; i < overlays.length; i++)
+	{
+		if(overlays[i].Active)
+			overlays[i].UpdateImage();
+	}
+	// Update Stupid Guys
+	for (int i = 0; i < stupidGuys.length; i++)
+	{
+		if(stupidGuys[i].Active)
+			stupidGuys[i].UpdateImage();
+	}
+	
+	ticksTime++;
 }
 
 void keyPressed() 
@@ -121,9 +374,31 @@ void keyPressed()
 	{
 		players[0].ChangeDirection();
     }
+	else if (key == 'v' || key == 'V') 
+	{
+		players[1].ChangeDirection();
+    }
+	else if (key == 'p' || key == 'P') 
+	{
+		players[2].ChangeDirection();
+    }
 }
 
 
+void createRandomLevel()
+{
+	// Objects
+	for (int i = 0; i < 6; i++)
+	{
+		objects[i].CreateRandomTimes(levelTimeout);
+	}
+	
+	// Stupid Guys
+	for (int i = 0; i < stupidGuys.length; i++)
+	{
+		stupidGuys[i].CreateRandomTimes(levelTimeout);
+	}
+}
 
 void updateBackground()
 {
