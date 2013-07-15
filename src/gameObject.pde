@@ -1,6 +1,6 @@
 class GameObject 
 { 
-	public Image Image = new Image();
+	public PImage Image;
 
 	public PImage Frame0Source;
 	public PImage Frame1Source;
@@ -110,7 +110,7 @@ class GameObject
 	{
 		if (Type == "beer" || Type == "plasticBag")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
@@ -124,7 +124,7 @@ class GameObject
 		}
 		else if (Type == "book" || Type == "gun")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
@@ -138,7 +138,7 @@ class GameObject
 		}
 		else if (Type == "birdLeft")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
@@ -155,7 +155,7 @@ class GameObject
 		}
 		else if (Type == "birdRight")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
@@ -192,7 +192,7 @@ class GameObject
 	{
 		if (Type == "bubble")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
@@ -218,7 +218,7 @@ class GameObject
 	{
 		if (Type == "bullet")
 		{
-			for (int i=0; i < Times.lenght; i++)
+			for (int i=0; i < Times.length; i++)
 			{
 				if (Times[i] == ticksTime)
 				{
