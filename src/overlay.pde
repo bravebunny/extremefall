@@ -42,6 +42,10 @@ class Overlay
 		{
 			//UpdateImage();
 		}
+		else
+		{
+			Hide();
+		}
 	}
 
 	public void UpdateImage()
@@ -76,6 +80,8 @@ class Overlay
 
 	public void AddToPlayer(Player player)
 	{
+		Active = true;
+		
 		X = player.X;
 		Y = player.Y;
 		Width = player.Width;

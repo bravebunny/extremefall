@@ -46,6 +46,7 @@ double resolutionRatio = 1;
 int levelTimeout = 1000;
 int playersTimeout = 100;
 long ticksTime = 0;
+int frame = 0;
 
 void setup() 
 {
@@ -115,6 +116,19 @@ void setup()
 
 void draw() 
 {
+	if(frame == 0) 
+	{
+		frame++;
+	}
+	else
+	{
+		gameLoop();
+		frame = 0;
+	}
+}
+
+void gameLoop()
+{
 	if (ticksTime < levelTimeout)
 	{
 		// Background Images
@@ -126,23 +140,26 @@ void draw()
 			if (ticksTime < playersTimeout)
 			{
 				if (players[i].Direction == "stop")
-				{
 					overlays[i].AddToPlayer(players[i]);
-					overlays[i].UpdateImage();
-				}
+				else
+					overlays[i].Hide();
+			}
+			else
+			{
+				overlays[i].Hide();
 			}
 		}
 		
 		// Zeca bubbles
 		for (int i = 0; i < stupidGuys[0].Times.length; i++)
 		{
-			if ((long)stupidGuys[0].Times[i] == ticksTime)
+			if ((long)stupidGuys[0].Times[i] > ticksTime && (long)stupidGuys[0].Times[i] < ticksTime + 2)
 			{
 				objects[7].Times[0] = (int)ticksTime + objects[7].Wait;
 			}
-			else if (ticksTime == stupidGuys[0].Times[i] + objects[7].Wait)
+			else if (ticksTime > stupidGuys[0].Times[i] + objects[7].Wait)
 			{
-				// Play Sound
+			
 			}
 		}
 		for (int i = 0; i < players.length; i++)
@@ -167,7 +184,7 @@ void draw()
 				objects[6].Update(ticksTime, players[i]);
 				objects[6].Update(ticksTime);
 
-				for (int o=0; o < objects[6].Times; o++)
+				for (int o=0; o < objects[6].Times.lenght; o++)
 				{
 					if (objects[6].Times[o] == ticksTime)
 					{
@@ -189,7 +206,7 @@ void draw()
 			objects[i].Update(ticksTime);
 		}
 		// Update Bubble acording to Zeca
-		objects[7].Update(ticksTime, stupidGuys[0]);
+		objects[7].Update(ticksTime, stupidGuys[0], true);
 		
 		//Update Overlays
 		for (int i = 0; i < overlays.length; i++)
@@ -269,7 +286,7 @@ void draw()
 							if (players[i].GunOn == false)
 							{
 								//soundPain.Play();
-								overlays[5].AddToPlayer(players[i], ticksTime);
+								overlays[5].AddToPlayer(players[i]);
 								overlays[5].Timeout = ticksTime + 1;
 								players[i].Score -= bulletPoints;
 

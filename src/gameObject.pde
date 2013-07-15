@@ -187,21 +187,18 @@ class GameObject
 		CenterY = Y + Height / 2;
 	}
 	
-	public void Update(long ticksTime, StupidGuy stupidGuy)
+	public void Update(long ticksTime, StupidGuy stupidGuy, boolean yes)
 	{
 		if (Type == "bubble")
 		{
-			for (int i=0; i < Times.length; i++)
+			if (Times[0] > ticksTime && Times[0] < ticksTime + 2)
 			{
-				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
-				{
-					Y = stupidGuy.Y + 24 * 4;
-					X = stupidGuy.X + 48 * 4;
-					SpeedX = random(5, 20);
-					SpeedY = random(5, 20);
-					
-					Active = true;
-				}
+				Active = true;
+				
+				Y = stupidGuy.Y + 24 * 4;
+				X = stupidGuy.X + 48 * 4;
+				SpeedX = random(5, 20);
+				SpeedY = random(5, 20);
 			}
 
 			X += SpeedX * ResolutionRatio;
@@ -216,18 +213,15 @@ class GameObject
 	{
 		if (Type == "bullet")
 		{
-			for (int i=0; i < Times.length; i++)
+			if (Times[0] > ticksTime && Times[0] < ticksTime + 2)
 			{
-				if (Times[i] > ticksTime && Times[i] < ticksTime + 2)
-				{
-					Y = player.Y + 50;
-					X = player.X;
-					SpeedX = random(5, 20);
-					
-					Active = true;
+				Y = player.Y + 50;
+				X = player.X;
+				SpeedX = random(5, 20);
+				
+				Active = true;
 
-					Direction = player.Direction;
-				}
+				Direction = player.Direction;
 			}
 		}
 
