@@ -1,7 +1,6 @@
-/* @pjs preload="players.png";  */
-/* @pjs preload="players.xml";  */
+/* @pjs preload="assets/tower.png, assets/sky.png, assets/playerOneLeft0.png, assets/playerOneLeft1.png, assets/playerOneRight0.png, assets/playerOneRight1.png";  */
 
-int width = 1366; //document.body.clientWidth;
+int width = 1366; //document.body.clientWidtqh;
 int height = 768; //document.body.clientHeight;
 
 PImage towerImg;
@@ -19,8 +18,8 @@ void setup()
 	if(width > 1366) width = 1366;
 	if(height > 768) height = 768;
 	
-	towerImg = loadImage("/assets/tower.png");
-	skyImg = loadImage("/assets/sky.png");
+	towerImg = loadImage("assets/tower.png");
+	skyImg = loadImage("assets/sky.png");
 	player = new Player("assets/playerOneLeft0.png", "assets/playerOneLeft1.png", "assets/playerOneRight0.png", "assets/playerOneRight1.png");
     player.SetSize(80, 30);
 	player.Speed = 2;
