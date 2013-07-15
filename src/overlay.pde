@@ -24,14 +24,14 @@ class Overlay
 	{
 		Frame0Source = loadImage(uri);
 		Frame1Source = loadImage(uri);
-		Image.Source = Frame0Source;
+		Image = Frame0Source;
 	}
 
 	public Overlay(String uri0, String uri1, String mode)
 	{
 		Frame0Source = loadImage(uri0);
 		Frame1Source = loadImage(uri1);
-		Image.Source = Frame0Source;
+		Image = Frame0Source;
 
 		Mode = mode;
 	}

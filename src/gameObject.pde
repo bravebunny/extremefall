@@ -257,6 +257,14 @@ class GameObject
 
 		set(X, Y, Image);
 	}
+	
+	public void SetScreenSize(double wid, double hei, double resolutionRatio)
+	{
+		ScreenWidth = wid;
+		ScreenHeight = hei;
+
+		ResolutionRatio = resolutionRatio;
+	}
 
 	public void SetSize(int wid, int hei)
 	{
