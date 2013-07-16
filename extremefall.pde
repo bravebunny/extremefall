@@ -534,6 +534,7 @@ void gameLoop()
 	}
 	else
 	{
+		updateScores();
 		screenName = "end";
 	}
 	
@@ -650,6 +651,24 @@ void createRandomLevel()
 	for (int i = 0; i < stupidGuys.length; i++)
 	{
 		stupidGuys[i].CreateRandomTimes(levelTimeout);
+	}
+}
+
+void updateScores()
+{
+	int winner = -1;
+	if (players[0].Score > players[1].Score && players[0].Score > players[2].Score)
+		winner = 0;
+	else if (players[1].Score > players[0].Score && players[1].Score > players[2].Score)
+		winner = 1;
+	else if (players[2].Score > players[1].Score && players[2].Score > players[0].Score)
+		winner = 2;
+	
+	if(winner != -1)
+	{	
+		overlays[6].AddToPlayer(players[winner]);
+		overlays[6].UpdateImage();
+		overlays[6].Hide();
 	}
 }
 
