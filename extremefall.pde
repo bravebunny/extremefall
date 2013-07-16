@@ -1,4 +1,5 @@
 /* @pjs preload="assets/tower.png, assets/sky.png";  */
+/* @pjs preload="assets/smoke.png, assets/thought.png";  */
 /* @pjs preload="assets/playerOneLeft0.png, assets/playerOneLeft1.png, assets/playerOneRight0.png, assets/playerOneRight1.png";  */
 /* @pjs preload="assets/playerTwoLeft0.png, assets/playerTwoLeft1.png, assets/playerTwoRight0.png, assets/playerTwoRight1.png";  */
 /* @pjs preload="assets/playerThreeLeft0.png, assets/playerThreeLeft1.png, assets/playerThreeRight0.png, assets/playerThreeRight1.png";  */
@@ -20,6 +21,9 @@ int towerSpeed = 20;
 PImage skyImg;
 int skyY = 0;
 int skySpeed = 1;
+
+PImage smokeImg;
+PImage thoughtImg;
 
 Player[] players = new Player[3];
 Overlay[] overlays = new Overlay[8];
@@ -48,6 +52,15 @@ int playersTimeout = 100;
 long ticksTime = 0;
 int frame = 0;
 
+String thoughtText = "";
+int thoughtOpacity = 0;
+int thoughtOpacitySteps = 5;
+String[] thoughts = { "     MAMAS     ","   Coisas...   ", "      Sim.     ", "   Aliens...   ", "       42      ", "    Boobies    " };
+
+int smokeOpacity = 0;
+int smokeOpacitySteps = 5;
+int horizontalSmokeSpeed = 5;
+
 void setup() 
 {
 	if(screenWidth > 1366) screenWidth = 1366;
@@ -56,6 +69,8 @@ void setup()
 
 	towerImg = loadImage("assets/tower.png");
 	skyImg = loadImage("assets/sky.png");
+	smokeImg = loadImage("assets/smoke.png");
+	thoughtImg = loadImage("assets/thought.png");
 	
 	players[0] = new Player("assets/playerOneLeft0.png", "assets/playerOneLeft1.png", "assets/playerOneRight0.png", "assets/playerOneRight1.png");
 	players[1] = new Player("assets/playerTwoLeft0.png", "assets/playerTwoLeft1.png", "assets/playerTwoRight0.png", "assets/playerTwoRight1.png");
@@ -110,8 +125,8 @@ void setup()
 	
 	background(125);
 	fill(0);
-	PFont fontA = loadFont("courier");
-	textFont(fontA, 14);
+	PFont fontA = loadFont("segoe");
+	textFont(fontA, 140);
 }
 
 void draw() 
@@ -178,19 +193,15 @@ void gameLoop()
 			if (players[i].GunOn)
 			{
 				// Add gun to player
+				overlays[4].Active = true;
 				overlays[4].AddToPlayer(players[i]);
+				players[i].GunOn = true;
+				overlays[4].UpdateImage(); // This shouldn't be needed here but otherwhise the image isn't displayed (Bug to be found)
 				// Bullet
 				objects[6].SetSpeed(30, 0);
 				objects[6].Update(ticksTime, players[i]);
 				objects[6].Update(ticksTime);
-
-				for (int o=0; o < objects[6].Times.lenght; o++)
-				{
-					if (objects[6].Times[o] == ticksTime)
-					{
-						//soundGunShot.Play();
-					}
-				}
+				//objects[6].UpdateImage(); // This shouldn't be needed here but otherwhise the image isn't displayed (Bug to be found)
 			}
 		}
 		
@@ -213,6 +224,52 @@ void gameLoop()
 		{
 			overlays[i].Update(ticksTime);
 		}
+		
+		// Thought
+		for (int i = 0; i < stupidGuys[1].Times.length; i++)
+		{
+			if (stupidGuys[1].Times[i] > ticksTime && stupidGuys[1].Times[i] < ticksTime + 2)
+			{
+				int o = (int)random(0, thoughts.length);
+				thoughtText = thoughts[o];
+				thoughtOpacity = 0;
+			}
+		}
+		
+		if ((stupidGuys[1].X < screenWidth && stupidGuys[1].X > 0) && (stupidGuys[1].Direction == "stop" || stupidGuys[1].Direction == "stop"))
+		{
+			if (thoughtOpacity < 100)
+				thoughtOpacity += thoughtOpacitySteps;
+		}
+
+		if (ticksTime > stupidGuys[1].Timeout)
+		{
+			if (thoughtOpacity > 0)
+				thoughtOpacity -= thoughtOpacitySteps;
+			else
+				thoughtText = "";
+		}
+		
+		// Smoke
+		if ((stupidGuys[2].X < screenWidth && stupidGuys[2].X > 0) && (stupidGuys[2].Direction == "stop" || stupidGuys[2].Direction == "stop"))
+		{
+			//soundFred.Play();
+			if (smokeOpacity < 100)
+				smokeOpacity += smokeOpacitySteps;
+		}
+
+		if (ticksTime > stupidGuys[2].Timeout)
+		{
+			if (smokeOpacity > 0)
+				smokeOpacity -= smokeOpacitySteps;
+		}
+
+		if (smokeOpacity > 0)
+		{
+			horizontalSpeed = horizontalSmokeSpeed * resolutionRatio;
+		}
+		else
+			horizontalSpeed = horizontalDefaultSpeed * resolutionRatio;
 		
 		// Player/Object Interaction
 		for (int i = 0; i < players.length; i++)
@@ -271,15 +328,14 @@ void gameLoop()
 						else if (objects[o].Type == "gun") // Gun
 						{
 							objects[o].Hide();
-
 							//soundGrabGun.Play();
 							players[i].GunOn = true;
 							players[i].Score += gunPoints;
-							overlays[4].Timeout = objects[o].Wait + (int)ticksTime;
+							overlays[4].AddToPlayer(players[i]);
+							overlays[4].Timeout = (int)ticksTime + objects[6].Wait / 5;
 							overlays[4].Active = true;
 
-							objects[6].Times[0] = (int)ticksTime + objects[6].Wait;
-
+							objects[6].Times[0] = (int)ticksTime + objects[6].Wait / 5;
 						}
 						else if (objects[o].Type == "bullet") // Bullet
 						{
@@ -380,6 +436,19 @@ void gameLoop()
 	{
 		if(stupidGuys[i].Active)
 			stupidGuys[i].UpdateImage();
+	}
+	
+	if (thoughtOpacity > 0)
+	{
+		set(0, 0,thoughtImg);
+		
+		fill(125);
+		text(thoughtText, 300, 350);
+	}
+
+	if (smokeOpacity > 0)
+	{
+		set(0, 0,smokeImg);
 	}
 	
 	ticksTime++;

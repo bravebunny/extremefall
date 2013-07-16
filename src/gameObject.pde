@@ -218,6 +218,7 @@ class GameObject
 				Y = player.Y + 50;
 				X = player.X;
 				SpeedX = random(5, 20);
+				player.GunOn = false;
 				
 				Active = true;
 
