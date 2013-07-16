@@ -1,3 +1,4 @@
+/* @pjs preload="assets/startScreen.png, assets/bottom.png";  */
 /* @pjs preload="assets/tower.png, assets/sky.png";  */
 /* @pjs preload="assets/smoke.png, assets/thought.png";  */
 /* @pjs preload="assets/playerOneLeft0.png, assets/playerOneLeft1.png, assets/playerOneRight0.png, assets/playerOneRight1.png";  */
@@ -14,7 +15,9 @@
 int screenWidth = 1366; //document.body.clientWidtqh;
 int screenHeight = 768; //document.body.clientHeight;
 
-PImage towerImg;
+PImage startImg;
+PImage bottomImg;
+
 int towerY = 0;
 int towerSpeed = 20;
 
@@ -61,16 +64,22 @@ int smokeOpacity = 0;
 int smokeOpacitySteps = 5;
 int horizontalSmokeSpeed = 5;
 
+String screenName = "start";
+
 void setup() 
 {
 	if(screenWidth > 1366) screenWidth = 1366;
 	if(screenHeight > 768) screenHeight = 768;
 	size(screenWidth, screenHeight);
 
+	startImg = loadImage("assets/startScreen.png");
+	
 	towerImg = loadImage("assets/tower.png");
 	skyImg = loadImage("assets/sky.png");
 	smokeImg = loadImage("assets/smoke.png");
 	thoughtImg = loadImage("assets/thought.png");
+	
+	bottomImg = loadImage("assets/bottom.png");
 	
 	players[0] = new Player("assets/playerOneLeft0.png", "assets/playerOneLeft1.png", "assets/playerOneRight0.png", "assets/playerOneRight1.png");
 	players[1] = new Player("assets/playerTwoLeft0.png", "assets/playerTwoLeft1.png", "assets/playerTwoRight0.png", "assets/playerTwoRight1.png");
@@ -131,14 +140,29 @@ void setup()
 
 void draw() 
 {
-	if(frame == 0) 
+	if(screenName == "start")
 	{
-		frame++;
+		set(0, 0,startImg);
 	}
-	else
+	else if(screenName == "game")
 	{
-		gameLoop();
-		frame = 0;
+		if(frame == 0) 
+		{
+			frame++;
+		}
+		else
+		{
+			gameLoop();
+			frame = 0;
+		}
+	}
+	else if(screenName == "end")
+	{
+	
+	}
+	else if(screenName == "pause")
+	{
+	
 	}
 }
 
@@ -468,8 +492,25 @@ void keyPressed()
 	{
 		players[2].ChangeDirection();
     }
+	else if (key == 'p' || key == 'P') 
+	{
+		players[2].ChangeDirection();
+    }
 }
 
+void mouseClicked() 
+{
+	if(screenName == "start")
+		screenName = "game";
+	else if(screenName == "game")
+		screenName = "pause";
+	else if(screenName == "end")
+	{
+	
+	}
+	else if(screenName == "pause")
+		screenName = "game";
+}
 
 void createRandomLevel()
 {
