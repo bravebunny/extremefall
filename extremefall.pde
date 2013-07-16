@@ -75,6 +75,9 @@ int horizontalSmokeSpeed = 5;
 
 String screenName = "start";
 
+boolean controlsHidden = true;
+boolean stuffHidden = true;
+
 void setup() 
 {
 	if(screenWidth > 1366) screenWidth = 1366;
@@ -84,7 +87,7 @@ void setup()
 	
 	background(157,221,216);
 	fill(222,249,247);
-	PFont fontA = loadFont("segoe");
+	PFont fontA = loadFont("verdana");
 	textFont(fontA, 120);
 	text("Loading...", 350, 350);
 
@@ -152,20 +155,27 @@ void setup()
 }
 
 void draw() 
-{
+{	
 	if(screenName == "start")
 	{
 		set(0, 0,startImg);
+		if(stuffHidden == true)
+		{
+			showStuff();
+			stuffHidden = false;
+		}
+		textSize(40);
+		text("Click to Play", 580,750);
 	}
 	else if(screenName == "game")
 	{
 		if(frame == 0) 
 		{
+			gameLoop();
 			frame++;
 		}
 		else
 		{
-			gameLoop();
 			frame = 0;
 		}
 	}
@@ -186,6 +196,12 @@ void gameLoop()
 	{
 		// Background Images
 		updateBackground();
+		
+		if(controlsHidden == true)
+		{
+			showControls();
+			controlsHidden = false;
+		}
 		
 		// Keys
 		for (int i = 0; i < players.length; i++)
@@ -230,6 +246,7 @@ void gameLoop()
 			{
 				// Add bubble to player
 				overlays[3].AddToPlayer(players[i]);
+				overlays[3].Y = players[i].Y - 25;
 				players[i].BubbleOn = overlays[3].Active;
 			}
 		}
@@ -542,6 +559,11 @@ void gameLoop()
 	ticksTime++;
 }
 
+void startGame()
+{
+	screenName = "game";
+}
+
 void restartGame()
 {
 	createRandomLevel();
@@ -561,19 +583,19 @@ void restartGame()
 	}
 
 	// Restart Objects Variables
-	for (int i = 0; i < objects.Length; i++)
+	for (int i = 0; i < objects.length; i++)
 	{
 		objects[i].Hide();
 	}
 
 	// Restart Overlays Variables
-	for (int i = 0; i < overlays.Length; i++)
+	for (int i = 0; i < overlays.length; i++)
 	{
 		overlays[i].Hide();
 	}
 
 	// Restart Stupid Guys Variables
-	for (int i = 0; i < stupidGuys.Length; i++)
+	for (int i = 0; i < stupidGuys.length; i++)
 	{
 		stupidGuys[i].Hide();
 	}
@@ -583,6 +605,14 @@ void restartGame()
 	ticksTime = 0;
 	
 	screenName = "game";
+}
+
+void pauseGame()
+{
+	if(screenName == "pause")
+		screenName = "game";
+	else
+		screenName = "pause";
 }
 
 void keyPressed() 
@@ -602,20 +632,20 @@ void keyPressed()
 	else if (key == ' ') 
 	{
 		if(screenName == "start")
-			screenName = "game";
+			startGame();
 		else if(screenName == "game")
-			screenName = "pause";
+			pauseGame();
 		else if(screenName == "end")
 			restartGame();
 		else if(screenName == "pause")
-			screenName = "game";
+			pauseGame();
     }
 }
 
 void mouseClicked() 
 {
 	if(screenName == "start")
-		screenName = "game";
+		startGame();
 	else if(screenName == "game")
 	{
 		//screenName = "pause";
@@ -629,7 +659,7 @@ void mouseClicked()
 	else if(screenName == "end")
 		restartGame();
 	else if(screenName == "pause")
-		screenName = "game";
+		pauseGame();
 }
 
 void createRandomLevel()

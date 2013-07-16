@@ -215,9 +215,9 @@ class GameObject
 		{
 			if (Times[0] > ticksTime && Times[0] < ticksTime + 2)
 			{
-				Y = player.Y + 50;
+				Y = player.Y;
 				X = player.X;
-				SpeedX = random(5, 20);
+				SpeedX = random(20, 50);
 				player.GunOn = false;
 				
 				Active = true;
