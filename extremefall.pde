@@ -67,7 +67,7 @@ int frame = 0;
 String thoughtText = "";
 int thoughtOpacity = 0;
 int thoughtOpacitySteps = 5;
-String[] thoughts = { "     MAMAS     ","   Coisas...   ", "      Sim.     ", "   Aliens...   ", "       42      ", "    Boobies    " };
+String[] thoughts = { "     Mamas     ","   Coisas...   ", "      Sim.     ", "   Aliens...   ", "       42      ", "    Boobies    " };
 
 int smokeOpacity = 0;
 int smokeOpacitySteps = 5;
@@ -193,7 +193,16 @@ void gameLoop()
 			if (ticksTime < playersTimeout)
 			{
 				if (players[i].Direction == "stop")
+				{
+					if(i == 0) 
+						fill(83,121,35,125);
+					else if(i == 1) 
+						fill(198,100,146,125);
+					else if(i == 2) 
+						fill(54,131,197,125);
+					rect(i*(screenWidth/3), 0, screenWidth/3, screenHeight);
 					overlays[i].AddToPlayer(players[i]);
+				}
 				else
 					overlays[i].Hide();
 			}
@@ -589,10 +598,6 @@ void keyPressed()
 	{
 		players[2].ChangeDirection();
     }
-	else if (key == 'p' || key == 'P') 
-	{
-		players[2].ChangeDirection();
-    }
 	else if (key == ' ') 
 	{
 		if(screenName == "start")
@@ -611,7 +616,15 @@ void mouseClicked()
 	if(screenName == "start")
 		screenName = "game";
 	else if(screenName == "game")
-		screenName = "pause";
+	{
+		//screenName = "pause";
+		if(mouseX < screenWidth/3)
+			players[0].ChangeDirection();
+		else if (mouseX > 2*(screenWidth/3))
+			players[2].ChangeDirection();
+		else
+			players[1].ChangeDirection();
+	}
 	else if(screenName == "end")
 		restartGame();
 	else if(screenName == "pause")
