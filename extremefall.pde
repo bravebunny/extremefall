@@ -1,6 +1,6 @@
 /* @pjs preload="assets/startScreen.png, assets/bottom.png";  */
 /* @pjs preload="assets/tower.png, assets/sky.png";  */
-/* @pjs preload="assets/smoke.png, assets/thought.png, assets/flash.png";  */
+/* @pjs preload="assets/smoke.png, assets/thought.png, assets/flash.png, assets/gil.png";  */
 /* @pjs preload="assets/playerOneLeft0.png, assets/playerOneLeft1.png, assets/playerOneRight0.png, assets/playerOneRight1.png";  */
 /* @pjs preload="assets/playerTwoLeft0.png, assets/playerTwoLeft1.png, assets/playerTwoRight0.png, assets/playerTwoRight1.png";  */
 /* @pjs preload="assets/playerThreeLeft0.png, assets/playerThreeLeft1.png, assets/playerThreeRight0.png, assets/playerThreeRight1.png";  */
@@ -29,6 +29,7 @@ int skySpeed = 1;
 PImage smokeImg;
 PImage thoughtImg;
 PImage flashImg;
+PImage gilImg;
 
 Player[] players = new Player[3];
 Overlay[] overlays = new Overlay[8];
@@ -49,6 +50,12 @@ int bulletPoints = 6;
 int bookPoints = 1;
 int plasticBagsPoints = 1;
 int birdPoints = 10;
+
+int[] gilTimes;
+int gilXRandom = 0;
+int gilYRandom = 0;
+double gilY = 1000;
+double gilX = 1000;
 
 double resolutionRatio = 1;
 
@@ -88,6 +95,7 @@ void setup()
 	smokeImg = loadImage("assets/smoke.png");
 	thoughtImg = loadImage("assets/thought.png");
 	flashImg = loadImage("assets/flash.png");
+	gilImg = loadImage("assets/gil.png");
 	
 	bottomImg = loadImage("assets/bottom.png");
 	
@@ -248,6 +256,20 @@ void gameLoop()
 		}
 		// Update Bubble acording to Zeca
 		objects[7].Update(ticksTime, stupidGuys[0], true);
+		
+		// Gil
+		for (int i = 0; i < gilTimes.length; i++)
+		{
+			if (gilTimes[i] > ticksTime && gilTimes[i] < ticksTime + 10)
+			{
+				gilY = screenHeight/2;
+				gilX = 0-500;
+				gilXRandom = (int)random(5, 10);
+				gilYRandom = (int)random(-10, 10);
+			}
+		}
+		gilY -= gilYRandom * resolutionRatio;
+		gilX += gilXRandom * resolutionRatio;
 		
 		//Update Overlays
 		for (int i = 0; i < overlays.length; i++)
@@ -598,6 +620,13 @@ void mouseClicked()
 
 void createRandomLevel()
 {
+	gilTimes = new int[(int)random(1,3)];
+	for (int i = 0; i < gilTimes.length; i++)
+	{
+		int timeSpacing = (int)(levelTimeout / (gilTimes.length + 1));
+		gilTimes[i] = (i + 1) * timeSpacing;
+	}
+
 	// Objects
 	for (int i = 0; i < 6; i++)
 	{
@@ -621,6 +650,9 @@ void updateBackground()
 	else
 		skyY += skySpeed;     
 	set(0, -skyY, skyImg);
+	
+	// Gil
+	set(gilX, gilY,gilImg);
 	
 	//Update tower
 	if(towerY >= towerImg.height - height - towerSpeed)
