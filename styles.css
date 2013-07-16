@@ -1,0 +1,12 @@
+.scores {
+	position:relative;
+	top:30px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	width: 800px;
+	font-family: 'helvetica neue', arial, verdana, sans-serif;
+	color: #FFFFFF;
+	font-size: medium;
+}

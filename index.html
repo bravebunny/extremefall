@@ -4,6 +4,7 @@
 		<title>Extreme Fall!</title>
 		<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
 		<script src="processing-1.4.1.min.js"></script>
+		<link rel="stylesheet" href="styles.css" type="text/css" media="screen">
 		<style>
 			* {margin: 0;padding: 0;line-height: 0;outline: none;}
 			html, body {height:100%; width:100%; overflow:hidden; background-color:#9DDDD8}
@@ -11,6 +12,12 @@
 		</style>
 	</head>
 	<body>
+		<script type="application/javascript">
+			var printMessage = function (msg) {
+				document.getElementById('msg').innerHTML = msg;
+			};
+		</script>
 		<canvas data-processing-sources="src/player.pde src/stupidGuy.pde src/gameObject.pde src/overlay.pde extremefall.pde"></canvas>
+		<div id="msg" class="scores"></div>
 	</body>
 </html>

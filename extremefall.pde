@@ -1,6 +1,6 @@
 /* @pjs preload="assets/startScreen.png, assets/bottom.png";  */
 /* @pjs preload="assets/tower.png, assets/sky.png";  */
-/* @pjs preload="assets/smoke.png, assets/thought.png";  */
+/* @pjs preload="assets/smoke.png, assets/thought.png, assets/flash.png";  */
 /* @pjs preload="assets/playerOneLeft0.png, assets/playerOneLeft1.png, assets/playerOneRight0.png, assets/playerOneRight1.png";  */
 /* @pjs preload="assets/playerTwoLeft0.png, assets/playerTwoLeft1.png, assets/playerTwoRight0.png, assets/playerTwoRight1.png";  */
 /* @pjs preload="assets/playerThreeLeft0.png, assets/playerThreeLeft1.png, assets/playerThreeRight0.png, assets/playerThreeRight1.png";  */
@@ -17,6 +17,7 @@ int screenHeight = 768; //document.body.clientHeight;
 
 PImage startImg;
 PImage bottomImg;
+int bottomImageY = 1000;
 
 int towerY = 0;
 int towerSpeed = 20;
@@ -27,6 +28,7 @@ int skySpeed = 1;
 
 PImage smokeImg;
 PImage thoughtImg;
+PImage flashImg;
 
 Player[] players = new Player[3];
 Overlay[] overlays = new Overlay[8];
@@ -71,6 +73,13 @@ void setup()
 	if(screenWidth > 1366) screenWidth = 1366;
 	if(screenHeight > 768) screenHeight = 768;
 	size(screenWidth, screenHeight);
+	bottomImageY = screenHeight;
+	
+	background(157,221,216);
+	fill(222,249,247);
+	PFont fontA = loadFont("segoe");
+	textFont(fontA, 120);
+	text("Loading...", 350, 350);
 
 	startImg = loadImage("assets/startScreen.png");
 	
@@ -78,6 +87,7 @@ void setup()
 	skyImg = loadImage("assets/sky.png");
 	smokeImg = loadImage("assets/smoke.png");
 	thoughtImg = loadImage("assets/thought.png");
+	flashImg = loadImage("assets/flash.png");
 	
 	bottomImg = loadImage("assets/bottom.png");
 	
@@ -131,11 +141,6 @@ void setup()
 	}
 
 	createRandomLevel();
-	
-	background(125);
-	fill(0);
-	PFont fontA = loadFont("segoe");
-	textFont(fontA, 140);
 }
 
 void draw() 
@@ -158,6 +163,7 @@ void draw()
 	}
 	else if(screenName == "end")
 	{
+		//set(0, bottomImageY,bottomImg);
 	
 	}
 	else if(screenName == "pause")
@@ -298,93 +304,96 @@ void gameLoop()
 		// Player/Object Interaction
 		for (int i = 0; i < players.length; i++)
 		{
-			if (players[i].MaxY > 0 && players[i].Y < screenWidth)
+			if(players[i].Active)
 			{
-				if (players[i].Direction != "stop") // Laser
+				if (players[i].MaxY > 0 && players[i].Y < screenWidth)
 				{
-					if (players[i].MaxX > screenWidth)
+					if (players[i].Direction != "stop") // Laser
 					{
-						//soundPain.Play();
-						players[i].Score -= laserPoints;
-						overlays[5].AddToPlayer(players[i]);
-						overlays[5].Timeout = ticksTime + 1;
-						players[i].X -= 10;
+						if (players[i].MaxX > screenWidth)
+						{
+							//soundPain.Play();
+							players[i].Score -= laserPoints;
+							overlays[5].AddToPlayer(players[i]);
+							overlays[5].Timeout = ticksTime + 1;
+							players[i].X -= 10;
+						}
+						else if (players[i].X < 0)
+						{
+							//soundPain.Play();
+							players[i].Score -= laserPoints;
+							overlays[5].AddToPlayer(players[i]);
+							overlays[5].Timeout = ticksTime + 1;
+							players[i].X += 10;
+						}
 					}
-					else if (players[i].X < 0)
-					{
-						//soundPain.Play();
-						players[i].Score -= laserPoints;
-						overlays[5].AddToPlayer(players[i]);
-						overlays[5].Timeout = ticksTime + 1;
-						players[i].X += 10;
-					}
-				}
 
-				for (int o = 0; o < objects.length; o++)
-				{
-					if ((players[i].X < objects[o].CenterX && objects[o].CenterX < (players[i].X + players[i].Width)) && (players[i].Y <= objects[o].CenterY && objects[o].CenterY <= (players[i].Y + players[i].Height)))
+					for (int o = 0; o < objects.length; o++)
 					{
-						if (objects[o].Type == "birdLeft" || objects[o].Type == "birdRight") // Birds
+						if ((players[i].X < objects[o].CenterX && objects[o].CenterX < (players[i].X + players[i].Width)) && (players[i].Y <= objects[o].CenterY && objects[o].CenterY <= (players[i].Y + players[i].Height)))
 						{
-							objects[o].Hide();
-							//soundBird.Play();
-							players[i].Score += birdPoints;
-						}
-						else if (objects[o].Type == "beer") // Beer
-						{
-							objects[o].Hide();
-							players[i].Score += beerPoints;
-							//soundBeer.Play();
-						}
-						else if (objects[o].Type == "bubble") // Bubble
-						{
-							if (!overlays[3].Active)
+							if (objects[o].Type == "birdLeft" || objects[o].Type == "birdRight") // Birds
 							{
 								objects[o].Hide();
-								//soundBubble.Play();
-								players[i].BubbleOn = true;
-								players[i].Score += bubblePoints;
-								overlays[3].AddToPlayer(players[i]);
-								overlays[3].Timeout = (int)ticksTime + overlays[3].Wait;
-								overlays[3].Active = true;
+								//soundBird.Play();
+								players[i].Score += birdPoints;
 							}
-						}
-						else if (objects[o].Type == "gun") // Gun
-						{
-							objects[o].Hide();
-							//soundGrabGun.Play();
-							players[i].GunOn = true;
-							players[i].Score += gunPoints;
-							overlays[4].AddToPlayer(players[i]);
-							overlays[4].Timeout = (int)ticksTime + objects[6].Wait / 5;
-							overlays[4].Active = true;
-
-							objects[6].Times[0] = (int)ticksTime + objects[6].Wait / 5;
-						}
-						else if (objects[o].Type == "bullet") // Bullet
-						{
-							if (players[i].GunOn == false)
+							else if (objects[o].Type == "beer") // Beer
 							{
-								//soundPain.Play();
-								overlays[5].AddToPlayer(players[i]);
-								overlays[5].Timeout = ticksTime + 1;
-								players[i].Score -= bulletPoints;
-
+								objects[o].Hide();
+								players[i].Score += beerPoints;
+								//soundBeer.Play();
 							}
-						}
-						else if (objects[o].Type == "plasticBag") // Plastic Bag
-						{
-							//soundBag.Play();
-							players[i].Score += plasticBagsPoints;
+							else if (objects[o].Type == "bubble") // Bubble
+							{
+								if (!overlays[3].Active)
+								{
+									objects[o].Hide();
+									//soundBubble.Play();
+									players[i].BubbleOn = true;
+									players[i].Score += bubblePoints;
+									overlays[3].AddToPlayer(players[i]);
+									overlays[3].Timeout = (int)ticksTime + overlays[3].Wait;
+									overlays[3].Active = true;
+								}
+							}
+							else if (objects[o].Type == "gun") // Gun
+							{
+								objects[o].Hide();
+								//soundGrabGun.Play();
+								players[i].GunOn = true;
+								players[i].Score += gunPoints;
+								overlays[4].AddToPlayer(players[i]);
+								overlays[4].Timeout = (int)ticksTime + objects[6].Wait / 5;
+								overlays[4].Active = true;
 
-							players[i].Y -= 10;
-						}
-						else if (objects[o].Type == "book") // Book
-						{
-							//soundBook.Play();
-							players[i].Score += bookPoints;
+								objects[6].Times[0] = (int)ticksTime + objects[6].Wait / 5;
+							}
+							else if (objects[o].Type == "bullet") // Bullet
+							{
+								if (players[i].GunOn == false)
+								{
+									//soundPain.Play();
+									overlays[5].AddToPlayer(players[i]);
+									overlays[5].Timeout = ticksTime + 1;
+									players[i].Score -= bulletPoints;
 
-							players[i].Y += 10;
+								}
+							}
+							else if (objects[o].Type == "plasticBag") // Plastic Bag
+							{
+								//soundBag.Play();
+								players[i].Score += plasticBagsPoints;
+
+								players[i].Y -= 10;
+							}
+							else if (objects[o].Type == "book") // Book
+							{
+								//soundBook.Play();
+								players[i].Score += bookPoints;
+
+								players[i].Y += 10;
+							}
 						}
 					}
 				}
@@ -419,6 +428,24 @@ void gameLoop()
 			}
 		}
 		
+		//  Update TextBlocks
+		printMessage("<b>Player One:</b> " + str(players[0].Score) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Player Two:</b>  " +str(players[1].Score) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Player Three:</b>  " +str(players[2].Score));
+		
+		// Let bottom image get up in the end
+		if (ticksTime > levelTimeout - 36)
+		{
+			if (bottomImageY > 0)
+				bottomImageY -=  24 * resolutionRatio;
+				
+			set(0, bottomImageY,bottomImg);
+		}
+		
+		// Flash the flash
+		if (ticksTime > levelTimeout - 5 && ticksTime < levelTimeout - 1)
+		{
+			set(0, 0,flashImg);
+		}
+		
 		// Update Players
 		for (int i = 0; i < players.length; i++)
 		{
@@ -428,54 +455,102 @@ void gameLoop()
 				players[i].UpdateImage();
 			}
 		}
-	}
-	
-	
-	if (ticksTime > playersTimeout)
-	{
-		// Hide players
-		for (int i = 0; i < players.length; i++)
+		if (ticksTime > playersTimeout)
 		{
-			if (players[i].Direction == "stop")
+			// Hide players
+			for (int i = 0; i < players.length; i++)
 			{
-				players[i].Hide();
+				if (players[i].Direction == "stop")
+				{
+					players[i].Hide();
+				}
 			}
 		}
-	}
+		
+		// Update Objects
+		for (int i = 0; i < objects.length; i++)
+		{
+			if(objects[i].Active)
+				objects[i].UpdateImage();
+		}
+		
+		// Update Overlays
+		for (int i = 0; i < overlays.length; i++)
+		{
+			if(overlays[i].Active)
+				overlays[i].UpdateImage();
+		}
+		
+		// Update Stupid Guys
+		for (int i = 0; i < stupidGuys.length; i++)
+		{
+			if(stupidGuys[i].Active)
+				stupidGuys[i].UpdateImage();
+		}
+		
+		if (thoughtOpacity > 0)
+		{
+			set(0, 0,thoughtImg);
+			
+			fill(125);
+			text(thoughtText, 300, 350);
+		}
 
-	// Update Objects
-	for (int i = 0; i < objects.length; i++)
-	{
-		if(objects[i].Active)
-			objects[i].UpdateImage();
+		if (smokeOpacity > 0)
+		{
+			set(0, 0,smokeImg);
+		}
 	}
-	// Update Overlays
-	for (int i = 0; i < overlays.length; i++)
+	else
 	{
-		if(overlays[i].Active)
-			overlays[i].UpdateImage();
-	}
-	// Update Stupid Guys
-	for (int i = 0; i < stupidGuys.length; i++)
-	{
-		if(stupidGuys[i].Active)
-			stupidGuys[i].UpdateImage();
+		screenName = "end";
 	}
 	
-	if (thoughtOpacity > 0)
-	{
-		set(0, 0,thoughtImg);
-		
-		fill(125);
-		text(thoughtText, 300, 350);
-	}
-
-	if (smokeOpacity > 0)
-	{
-		set(0, 0,smokeImg);
-	}
 	
 	ticksTime++;
+}
+
+void restartGame()
+{
+	createRandomLevel();
+
+	thoughtOpacity = 0;
+	smokeOpacity = 0;
+
+	// Restart Players Variables
+	for (int i = 0; i < players.length; i++)
+	{
+		players[i].Active = true;
+		players[i].Score = 0;
+		players[i].BubbleOn = false;
+		players[i].GunOn = false;
+		players[i].Direction = "stop";
+		players[i].SetPosition((double)(i + 1) * (screenWidth / 4) - players[i].Width / 2, (double)(screenHeight / 2) - 100);
+	}
+
+	// Restart Objects Variables
+	for (int i = 0; i < objects.Length; i++)
+	{
+		objects[i].Hide();
+	}
+
+	// Restart Overlays Variables
+	for (int i = 0; i < overlays.Length; i++)
+	{
+		overlays[i].Hide();
+	}
+
+	// Restart Stupid Guys Variables
+	for (int i = 0; i < stupidGuys.Length; i++)
+	{
+		stupidGuys[i].Hide();
+	}
+
+	bottomImageY = screenHeight;
+
+	ticksTime = 0;
+	
+	screenName = "game";
 }
 
 void keyPressed() 
@@ -496,6 +571,17 @@ void keyPressed()
 	{
 		players[2].ChangeDirection();
     }
+	else if (key == ' ') 
+	{
+		if(screenName == "start")
+			screenName = "game";
+		else if(screenName == "game")
+			screenName = "pause";
+		else if(screenName == "end")
+			restartGame();
+		else if(screenName == "pause")
+			screenName = "game";
+    }
 }
 
 void mouseClicked() 
@@ -505,9 +591,7 @@ void mouseClicked()
 	else if(screenName == "game")
 		screenName = "pause";
 	else if(screenName == "end")
-	{
-	
-	}
+		restartGame();
 	else if(screenName == "pause")
 		screenName = "game";
 }
